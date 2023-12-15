@@ -1,0 +1,28 @@
+version: '1.0'
+services:
+  data_base:
+    restart: always
+    image: "postgres:15.0"
+    container_name: data_base
+    volumes:
+      - ./data_base/:/var/lib/postgresql/pgdata4
+    environment:
+      PGDATA: "/var/lib/postgresql/pgdata"
+      POSTGRESS_USER: postgres
+      POSTGRESS_PASSWORD: postgres
+      POSTGRESS_DB: postgres
+    ports:
+      - 5433:5432
+
+  api:
+    restart: always
+    build: ./api
+    env_file:
+      - ./env
+    command: bash -c " uvicorn main:app --reload --workers 4 --host 0.0.0.0 --port 8000"
+    ports:
+      - 8000:8000
+    depends_on:
+      - data_base
+    volumes:
+      - ./api:/api
